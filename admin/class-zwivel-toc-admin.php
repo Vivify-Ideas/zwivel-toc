@@ -130,6 +130,7 @@ class Zwivel_Toc_Admin {
                 echo '<input type="hidden" name="h-tags[ids][]" value="' . $hTag['id'] . '" class="widefat">';
                 echo '<input type="hidden" name="h-tags[default_values][]" value="' . $hTag['default_value'] . '" class="widefat">';
                 echo '<input type="text" name="h-tags[values][]" value="' . $hTag['value'] . '" class="widefat">';
+                echo '<small>#' . str_replace( ' ', '_', $hTag['default_value'] )  . '</small>';
 
                 echo '<br/>';
             }
@@ -143,6 +144,7 @@ class Zwivel_Toc_Admin {
                 echo '<input type="hidden" name="h-tags[ids][]" value="' . $heading['id'] . '" class="widefat">';
                 echo '<input type="hidden" name="h-tags[default_values][]" value="' . strip_tags( $heading[0] )  . '" class="widefat">';
                 echo '<input type="text" name="h-tags[values][]" value="' . strip_tags( $heading[0] )  . '" class="widefat">';
+                echo '<small>#' . str_replace( ' ', '_', $heading[0] )  . '</small>';
 
                 echo '<br/>';
             }
