@@ -121,9 +121,11 @@ class Zwivel_Toc_Admin {
     {
         global $post;
 
-        $hTags = $this->shared->prepareHTags();
+        $hTagsFromDB = get_post_meta( $post->ID, '_zwivel-toc-h-tags', TRUE );
 
-        if (!empty($hTags)) {
+        if (!empty($hTagsFromDB)) {
+            $hTags = $this->shared->prepareHTags($hTagsFromDB);
+
             foreach ($hTags as $hTag) {
                 echo '<span>H' . $hTag['heading'] . '</span>';
                 echo '<input type="hidden" name="h-tags[headings][]" value="' . $hTag['heading'] . '" class="widefat">';
@@ -144,7 +146,7 @@ class Zwivel_Toc_Admin {
                 echo '<input type="hidden" name="h-tags[ids][]" value="' . $heading['id'] . '" class="widefat">';
                 echo '<input type="hidden" name="h-tags[default_values][]" value="' . strip_tags( $heading[0] )  . '" class="widefat">';
                 echo '<input type="text" name="h-tags[values][]" value="' . strip_tags( $heading[0] )  . '" class="widefat">';
-                echo '<small>#' . str_replace( ' ', '_', $heading[0] )  . '</small>';
+                echo '<small>#' . str_replace( ' ', '_', strip_tags($heading[0] ))  . '</small>';
 
                 echo '<br/>';
             }

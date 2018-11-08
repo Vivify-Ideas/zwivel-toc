@@ -32,30 +32,49 @@
 	//TESTING
 	$(function() {
 
-    var topMenu = $('#zwivel-toc-container');
-    var topMenuHeight = topMenu.outerHeight() + 1;
-    // console.log(topMenuHeight);
-      // // All list items
-      // menuItems = topMenu.find("a"),
-      // // Anchors corresponding to menu items
-      // scrollItems = menuItems.map(function(){
-      //   var item = $($(this).attr("href"));
-      //   if (item.length) { return item; }
-      // });
+    var sidebarTOC = $('#zwivel-toc-container');
+    var contentHTags = $('.zwivel-toc-section');
+    var stickyTOCHeader = $('.zw-c-toc');
+    // var stickyTOCHeaderContent = [];
+    var stickyTOCHeaderTitle = $('.js-toc-title');
+    var stickyTOCHeaderNextTitle = $('.zw-c-toc-chapter-next');
+
+    // $('.zwivel-toc-section').each(function(index, tocItem) {
+    //   stickyTOCHeaderContent.push(
+    //     {
+    //       text: $(tocItem).text(),
+    //       id: $(tocItem).attr('id')
+    //     }
+    //   );
+    // });
+
+    // console.log(stickyTOCHeaderContent);
 
     $(window).scroll(function() {
-      var fromTop = $(this).scrollTop() + topMenuHeight;
-      // console.log(fromTop);
-      $('.zwivel-toc-section').each(function() {
-        if ($(window).scrollTop() >= $(this).offset().top) {
-          console.log($(this).attr('id'));
-          var id = $(this).attr('id');
-          $('.ez-toc-list li a').removeClass('active_underlined');
-          $('.ez-toc-list li a[href=#'+ id +']').addClass('active_underlined');
+
+      var elementTop = sidebarTOC.offset().top;
+      var elementBottom = elementTop + sidebarTOC.outerHeight();
+      var viewportTop = $(window).scrollTop();
+      // var viewportBottom = viewportTop + $(window).height();
+
+      if (elementBottom < viewportTop) {
+        stickyTOCHeader.css('display', 'block');
+      } else {
+        stickyTOCHeader.css('display', 'none');
+      }
+
+      contentHTags.each(function(index, item) {
+        if ($(window).scrollTop() >= $(item).offset().top) {
+          // var id = $(this).attr('id');
+          // $('.ez-toc-list li a').removeClass('active_underlined');
+          // $('.ez-toc-list li a[href=#'+ id +']').addClass('active_underlined');
+
+          stickyTOCHeaderTitle.text($(item).text());
+          stickyTOCHeaderNextTitle.text(contentHTags.eq(index + 1).text());
+
         }
       })
     });
-
 
   });
 

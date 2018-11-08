@@ -166,26 +166,26 @@ class Zwivel_Toc_Shared
     }
 
 
-    public function prepareHTags() {
-        global $post;
-
-        $hTagsFromDB = get_post_meta( $post->ID, '_zwivel-toc-h-tags', TRUE );
+    public function prepareHTags($tagsFromDb) {
+//        global $post;
+//
+//        $hTagsFromDB = get_post_meta( $post->ID, '_zwivel-toc-h-tags', TRUE );
         $hTags = [];
 
-        for ($i = 0; $i < count($hTagsFromDB['headings']); $i++) {
-            $hTags[$i]['heading'] = $hTagsFromDB['headings'][$i];
+        for ($i = 0; $i < count($tagsFromDb['headings']); $i++) {
+            $hTags[$i]['heading'] = $tagsFromDb['headings'][$i];
         }
 
-        for ($i = 0; $i < count($hTagsFromDB['values']); $i++) {
-            $hTags[$i]['value'] = $hTagsFromDB['values'][$i];
+        for ($i = 0; $i < count($tagsFromDb['values']); $i++) {
+            $hTags[$i]['value'] = $tagsFromDb['values'][$i];
         }
 
-        for ($i = 0; $i < count($hTagsFromDB['default_values']); $i++) {
-            $hTags[$i]['default_value'] = $hTagsFromDB['default_values'][$i];
+        for ($i = 0; $i < count($tagsFromDb['default_values']); $i++) {
+            $hTags[$i]['default_value'] = $tagsFromDb['default_values'][$i];
         }
 
-        for ($i = 0; $i < count($hTagsFromDB['ids']); $i++) {
-            $hTags[$i]['id'] = $hTagsFromDB['ids'][$i];
+        for ($i = 0; $i < count($tagsFromDb['ids']); $i++) {
+            $hTags[$i]['id'] = $tagsFromDb['ids'][$i];
         }
 
         return $hTags;
