@@ -192,6 +192,171 @@ class Zwivel_Toc_Shared
     }
 
 
+
+
+
+
+
+    public function getTOC($hTags)
+    {
+        $html = '';
+
+        // add container, toc title and list items
+        $html .= '<div id="zwivel-toc-container" class="sidebar-widget zw-toc-container clearfix">' . PHP_EOL;
+
+        $html .= '<div class="widget-title-wrapper zwivel-toc-title-container">' . PHP_EOL;
+
+        $html .= '<h3 class="widget-title zwivel-toc-title">CONTENTS</h3>' . PHP_EOL;
+
+        $html .= '</div>' . PHP_EOL;
+
+        ob_start();
+        $html .= ob_get_clean();
+        $html .= $this->getTOCList($hTags);
+
+        ob_start();
+        $html .= ob_get_clean();
+        $html .= '</div>' . PHP_EOL;
+
+        return $html;
+
+    }
+
+    public function getTOCList($hTags)
+    {
+        $html = '';
+
+//        if ( $this->hasTOCItems ) {
+        $html .= $this->createTOC( $hTags );
+        $html  = '<ul class="toc_widget_list no_bullets ez-toc-list">' . $html . '</ul>';
+//        }
+
+        return $html;
+    }
+
+    /**
+     * Generate the TOC list items for a given page within a post.
+     *
+     * @access private
+     * @since  2.0
+     *
+     * @param int   $page    The page of the post to create the TOC items for.
+     * @param array $matches The heading from the post content extracted with preg_match_all().
+     *
+     * @return string The HTML list of TOC items.
+     */
+    public function createTOC( $hTags )
+    {
+        $html = '';
+
+        $current_depth      = 100;    // headings can't be larger than h6 but 100 as a default to be sure
+        $numbered_items     = array();
+        $numbered_items_min = NULL;
+
+        // find the minimum heading to establish our baseline
+        for ( $i = 0; $i < count( $hTags ); $i ++ ) {
+            if ( $current_depth > $hTags[ $i ]['heading'] ) {
+                $current_depth = (int) $hTags[ $i ]['heading'];
+            }
+        }
+
+        $numbered_items[ $current_depth ] = 0;
+        $numbered_items_min = $current_depth;
+
+        for ( $i = 0; $i < count( $hTags ); $i ++ ) {
+
+            if ( $current_depth == (int) $hTags[ $i ]['heading'] ) {
+
+                $html .= '<li>';
+            }
+
+            // start lists
+            if ( $current_depth != (int) $hTags[ $i ]['heading'] ) {
+
+                for ( $current_depth; $current_depth < (int) $hTags[ $i ]['heading']; $current_depth++ ) {
+
+                    $numbered_items[ $current_depth + 1 ] = 0;
+                    $html .= '<ul><li>';
+                }
+            }
+
+            $title = !empty($hTags[ $i ]['value']) ? $hTags[ $i ]['value'] : $hTags[ $i ]['default_value'];
+
+            $html .= $this->createTOCItemAnchor( $hTags[ $i ]['id'], $title );
+
+            // end lists
+            if ( $i != count( $hTags ) - 1 ) {
+
+                if ( $current_depth > (int) $hTags[ $i + 1 ]['heading'] ) {
+
+                    for ( $current_depth; $current_depth > (int) $hTags[ $i + 1 ]['heading']; $current_depth-- ) {
+
+                        $html .= '</li></ul>';
+                        $numbered_items[ $current_depth ] = 0;
+                    }
+                }
+
+                if ( $current_depth == (int) @$hTags[ $i + 1 ]['heading'] ) {
+
+                    $html .= '</li>';
+                }
+
+            } else {
+
+                // this is the last item, make sure we close off all tags
+                for ( $current_depth; $current_depth >= $numbered_items_min; $current_depth-- ) {
+
+                    $html .= '</li>';
+
+                    if ( $current_depth != $numbered_items_min ) {
+                        $html .= '</ul>';
+                    }
+                }
+            }
+        }
+
+        return $html;
+    }
+
+
+    /**
+     * @access private
+     * @since  2.0
+     *
+     * @param int    $page
+     * @param string $id
+     * @param string $title
+     *
+     * @return string
+     */
+    private function createTOCItemAnchor( $id, $title )
+    {
+        return sprintf(
+            '<a href="%1$s" title="%2$s">' . $title . '</a>',
+            esc_url( $this->createTOCItemURL( $id ) ),
+            esc_attr( strip_tags( $title ) )
+        );
+    }
+
+
+    /**
+     * @access private
+     * @since  2.0
+     *
+     * @param string $id
+     * @param int    $page
+     *
+     * @return string
+     */
+    private function createTOCItemURL( $id )
+    {
+        return '#' . $id;
+    }
+
+
+
+
+
     /**
      * Returns a string with all items from the $find array replaced with their matching
      * items in the $replace array.  This does a one to one replacement (rather than globally).

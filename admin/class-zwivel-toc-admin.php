@@ -121,11 +121,22 @@ class Zwivel_Toc_Admin {
     {
         global $post;
 
+        $value = get_post_meta($post->ID, '_zwivel-toc-off', true);
+
+        ?>
+
+        <div class="zw-toc-admin-checkbox">
+            <label><input type="checkbox" value="1" <?php checked($value, true, true); ?> name="zwivel-toc-off" />Turn off TOC for this post</label>
+        </div>
+
+        <?php
+
         $hTagsFromDB = get_post_meta( $post->ID, '_zwivel-toc-h-tags', TRUE );
 
         if (!empty($hTagsFromDB)) {
             $hTags = $this->shared->prepareHTags($hTagsFromDB);
 
+            //@TODO pretabaj da ide cist html umesto ovih echo-a
             foreach ($hTags as $hTag) {
                 echo '<span>H' . $hTag['heading'] . '</span>';
                 echo '<input type="hidden" name="h-tags[headings][]" value="' . $hTag['heading'] . '" class="widefat">';
@@ -165,8 +176,14 @@ class Zwivel_Toc_Admin {
      */
     public function save($post_id, $post, $update)
     {
-        if ( isset( $_REQUEST['h-tags'] ) && ! empty( $_REQUEST['h-tags'] ) ) {
+        if ( isset( $_REQUEST['h-tags'] ) && !empty( $_REQUEST['h-tags'] ) ) {
             update_post_meta( $post_id, '_zwivel-toc-h-tags', $_REQUEST['h-tags'] );
+        }
+
+        if ( isset( $_REQUEST['zwivel-toc-off'] ) && !empty( $_REQUEST['zwivel-toc-off'] ) ) {
+            update_post_meta( $post_id, '_zwivel-toc-off', $_REQUEST['zwivel-toc-off'] );
+        } else {
+            delete_post_meta($post_id, '_zwivel-toc-off');
         }
     }
 
