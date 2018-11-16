@@ -4,7 +4,7 @@
  */
 
 
-.active_underlined {
+.zw-c-toc-dropdown-menu-current {
     background-color: #1e6556;
     color: white;
 }
@@ -63,6 +63,12 @@
     background-color: #0d7c7c;
 }
 
+.zw-c-toc .zw-c-btn.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+    background-color: transparent;
+}
+
 .zw-c-toc .zw-c-icon {
     display: inline-block;
     width: 1rem;
@@ -83,7 +89,7 @@
 .zw-c-toc-dropdown {
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: normal;
 }
 
 .zw-c-toc-dropdown:hover .zw-c-toc-dropdown-menu,
@@ -104,6 +110,8 @@
     color: #ffffff;
     font-size: 13px;
     list-style: none;
+    overflow: visible;
+    white-space: unset;
     background-color: #1eb798;
 }
 
@@ -170,6 +178,6 @@
     padding-bottom: 30px;
 }
 
-.ez-toc-list > li ul {
+.zw-toc-list > li ul {
     margin-left: 20px;
 }

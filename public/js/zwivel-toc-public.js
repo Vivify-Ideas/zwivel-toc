@@ -35,76 +35,105 @@
     var contentHTags = $('.zwivel-toc-section');
     var stickyTOCHeader = $('.zw-c-toc');
     var stickyTOCHeaderTitle = $('.js-toc-title');
+    var stickyTOCHeaderNextHolder = $('.zw-c-toc-chapter');
     var stickyTOCHeaderNextTitle = $('.zw-c-toc-chapter-next');
-
-    // @TODO height must change if not logged in as admin
+    var stickyTOCHeaderNextBtn = $('.zw-c-btn-next');
+    var stickyTOCHeaderPreviousBtn = $('.zw-c-btn-previous');
     var headerOffset = 150;
-
-    // var currentId;
     var nextId;
     var previousId;
 
-    $(window).scroll(function() {
 
+    $(window).scroll(function() {
+      toggleStickyTOC();
+
+      contentHTags.each(function(index, item) {
+        if ($(window).scrollTop() >= $(item).offset().top - headerOffset) {
+
+          nextId = contentHTags.eq(index + 1).attr('id');
+          previousId = contentHTags.eq(index - 1).attr('id');
+
+          var id = $(this).attr('id');
+          markCurrentItemInDropdown(id);
+
+          setCurrentAndNextTitleInStickyTOC(index, item);
+          handleStickyHeaderNextButtonAppearance();
+        }
+      })
+    });
+
+
+    function toggleStickyTOC() {
       var elementTop = sidebarTOC.offset().top;
       var elementBottom = elementTop + sidebarTOC.outerHeight();
       var viewportTop = $(window).scrollTop();
-      // var viewportBottom = viewportTop + $(window).height();
 
       if (elementBottom < viewportTop) {
         stickyTOCHeader.css('display', 'block');
       } else {
         stickyTOCHeader.css('display', 'none');
       }
+    }
 
-      contentHTags.each(function(index, item) {
-        if ($(window).scrollTop() >= $(item).offset().top - headerOffset) {
+    function markCurrentItemInDropdown(id) {
+      $('.zw-c-toc-dropdown-menu li a').removeClass('zw-c-toc-dropdown-menu-current');
+      $('.zw-c-toc-dropdown-menu li a[href=#'+ id +']').addClass('zw-c-toc-dropdown-menu-current');
+    }
 
-          // currentId = $(item).attr('id');
-          nextId = contentHTags.eq(index + 1).attr('id');
-          previousId = contentHTags.eq(index - 1).attr('id');
+    function setCurrentAndNextTitleInStickyTOC(index, item) {
+      stickyTOCHeaderTitle.text($(item).text());
+      stickyTOCHeaderNextTitle.text(contentHTags.eq(index + 1).text());
+    }
 
-          var id = $(this).attr('id');
-          $('.zw-c-toc-dropdown-menu li a').removeClass('active_underlined');
-          $('.zw-c-toc-dropdown-menu li a[href=#'+ id +']').addClass('active_underlined');
+    function handleStickyHeaderNextButtonAppearance() {
+      if (!nextId) {
+        stickyTOCHeaderNextBtn.addClass('disabled');
+        stickyTOCHeaderNextHolder.text('');
+      } else {
+        stickyTOCHeaderNextBtn.removeClass('disabled');
+        stickyTOCHeaderNextHolder.text('Next:');
+      }
+    }
 
-          stickyTOCHeaderTitle.text($(item).text());
-          stickyTOCHeaderNextTitle.text(contentHTags.eq(index + 1).text());
 
-        }
-      })
+    /******************/
+    /* click handlers */
+    /******************/
+    stickyTOCHeaderPreviousBtn.click(function() {
+      scrollToID(previousId);
     });
 
-
-    $('.zw-c-btn-previous').click(function() {
-      $('html, body').animate({
-        scrollTop: $('#' + previousId).offset().top - headerOffset + 1
-      }, 500);
+    stickyTOCHeaderNextBtn.click(function() {
+      if (nextId) {
+        scrollToID(nextId)
+      }
     });
 
-    $('.zw-c-btn-next').click(function() {
-      $('html, body').animate({
-        scrollTop: $('#' + nextId).offset().top - headerOffset + 1
-      }, 500);
-    });
-
-
-    // @TODO preimenovati klasu da krece sa 'zw'
-    $('.ez-toc-list li a').click(function(e) {
+    $('.zw-toc-list li a').click(function(e) {
       e.preventDefault();
       var currentId = $(this).attr('href');
+      scrollToCurrentHeading(currentId);
+    });
+
+    $('.zw-c-toc-dropdown-menu li:not(.zw-u-first) a').click(function(e) {
+      e.preventDefault();
+      var currentId = $(this).attr('href');
+      scrollToCurrentHeading(currentId);
+    });
+
+
+
+    function scrollToID(id) {
+      $('html, body').animate({
+        scrollTop: $('#' + id).offset().top - headerOffset + 1
+      }, 500);
+    }
+
+    function scrollToCurrentHeading(currentId) {
       $('html, body').animate({
         scrollTop: $(currentId).offset().top - headerOffset + 1
       }, 500);
-    });
-
-    $('.zw-c-toc-dropdown-menu li a').click(function(e) {
-      e.preventDefault();
-      var currentId = $(this).attr('href');
-      $('html, body').animate({
-        scrollTop: $(currentId).offset().top - headerOffset + 1
-      }, 500);
-    });
+    }
 
   });
 

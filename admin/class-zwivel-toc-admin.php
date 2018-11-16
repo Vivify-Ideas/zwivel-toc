@@ -75,7 +75,7 @@ class Zwivel_Toc_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/zwivel-toc-admin.css', array(), $this->version, 'all' );
+		wp_enqueue_style( 'zwivel-toc-admin-css', plugin_dir_url( __FILE__ ) . 'css/zwivel-toc-admin.css', array(), rand(1, 99999), 'all' );
 
 	}
 
@@ -99,7 +99,7 @@ class Zwivel_Toc_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/zwivel-toc-admin.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( 'zwivel-toc-admin-js', plugin_dir_url( __FILE__ ) . 'js/zwivel-toc-admin.js', array('jquery'), rand(1, 99999), false );
 
 	}
 
@@ -122,44 +122,55 @@ class Zwivel_Toc_Admin {
         global $post;
 
         $value = get_post_meta($post->ID, '_zwivel-toc-off', true);
+        $checked = !empty($value) ? 'checked="checked"' : '';
 
-        ?>
+        echo '<div class="zw-toc-admin-checkbox">';
+        echo '<label><input type="checkbox" value="1" ' . $checked . ' name="zwivel-toc-off" />Turn off TOC for this post</label>';
+        echo '</div>';
 
-        <div class="zw-toc-admin-checkbox">
-            <label><input type="checkbox" value="1" <?php checked($value, true, true); ?> name="zwivel-toc-off" />Turn off TOC for this post</label>
-        </div>
-
-        <?php
 
         $hTagsFromDB = get_post_meta( $post->ID, '_zwivel-toc-h-tags', TRUE );
 
         if (!empty($hTagsFromDB)) {
             $hTags = $this->shared->prepareHTags($hTagsFromDB);
 
-            //@TODO pretabaj da ide cist html umesto ovih echo-a
-            foreach ($hTags as $hTag) {
-                echo '<span>H' . $hTag['heading'] . '</span>';
-                echo '<input type="hidden" name="h-tags[headings][]" value="' . $hTag['heading'] . '" class="widefat">';
-                echo '<input type="hidden" name="h-tags[ids][]" value="' . $hTag['id'] . '" class="widefat">';
-                echo '<input type="hidden" name="h-tags[default_values][]" value="' . $hTag['default_value'] . '" class="widefat">';
-                echo '<input type="text" name="h-tags[values][]" value="' . $hTag['value'] . '" class="widefat">';
-                echo '<small>#' . str_replace( ' ', '_', $hTag['default_value'] )  . '</small>';
+            for ($i = 0; $i < count($hTags); $i++) {
 
-                echo '<br/>';
+                $checked = (!empty($hTags[$i]['exclude'])) ? 'checked="checked"' : '';
+
+                echo '<div class="zw-c-admin-checkbox-container">';
+                echo '<div class="zw-c-admin-checkbox-item">';
+                echo '<input type="hidden" name="h-tags[exclude][' . $i . ']" value="0">';
+                echo '<input class="zw-c-admin-checkbox" type="checkbox" '. $checked . '" name="h-tags[exclude][' . $i . ']" value="1">';
+                echo '<label>H' . $hTags[$i]['heading'] . '</label>';
+                echo '</div>';
+                echo '<input type="hidden" name="h-tags[headings][' . $i . ']" value="' . $hTags[$i]['heading'] . '">';
+                echo '<input type="hidden" name="h-tags[ids][' . $i . ']" value="' . $hTags[$i]['id'] . '">';
+                echo '<input type="hidden" name="h-tags[default_values][' . $i . ']" value="' . $hTags[$i]['default_value'] . '">';
+                echo '<input type="text" name="h-tags[values][' . $i . ']" value="' . $hTags[$i]['value'] . '">';
+                echo '<small>#' . str_replace( ' ', '_', $hTags[$i]['default_value'] )  . '</small>';
+
+                echo '</div>';
             }
         } else {
             $headings = $this->shared->extractHeadings($post->post_content);
 
-            foreach ($headings as $heading) {
+            for ($i = 0; $i < count($headings); $i++) {
+                $checked = (isset($headings[$i]['exclude'])) ? 'checked="checked"' : '';
 
-                echo '<span>H' . $heading[2] . '</span>';
-                echo '<input type="hidden" name="h-tags[headings][]" value="' . $heading[2] . '" class="widefat">';
-                echo '<input type="hidden" name="h-tags[ids][]" value="' . $heading['id'] . '" class="widefat">';
-                echo '<input type="hidden" name="h-tags[default_values][]" value="' . strip_tags( $heading[0] )  . '" class="widefat">';
-                echo '<input type="text" name="h-tags[values][]" value="' . strip_tags( $heading[0] )  . '" class="widefat">';
-                echo '<small>#' . str_replace( ' ', '_', strip_tags($heading[0] ))  . '</small>';
+                echo '<div class="zw-c-admin-checkbox-container">';
+                echo '<div class="zw-c-admin-checkbox-item">';
+                echo '<input type="hidden" name="h-tags[exclude][' . $i . ']" value="0">';
+                echo '<input class="zw-c-admin-checkbox" type="checkbox" '. $checked . '" name="h-tags[exclude][' . $i . ']" value="1">';
+                echo '<label>H' . $headings[$i][2] . '</label>';
+                echo '</div>';
+                echo '<input type="hidden" name="h-tags[headings][' . $i . ']" value="' . $headings[$i][2] . '">';
+                echo '<input type="hidden" name="h-tags[ids][' . $i . ']" value="' . $headings[$i]['id'] . '">';
+                echo '<input type="hidden" name="h-tags[default_values][' . $i . ']" value="' . strip_tags($headings[$i][0]) . '">';
+                echo '<input type="text" name="h-tags[values][' . $i . ']" value="' . strip_tags($headings[$i][0]) . '">';
+                echo '<small>#' . str_replace( ' ', '_', strip_tags($headings[$i][0]) )  . '</small>';
 
-                echo '<br/>';
+                echo '</div>';
             }
         }
 

@@ -74,7 +74,7 @@ class Zwivel_Toc_Public
          * class.
          */
 
-        wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/zwivel-toc-public.css', array(), $this->version, 'all');
+        wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/zwivel-toc-public.css', array(), rand(1, 99999), 'all');
 
     }
 
@@ -108,7 +108,7 @@ class Zwivel_Toc_Public
         }
 
         if ($post->post_type === 'post' && !empty($hTagsFromDB)) {
-            wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/zwivel-toc-public.js', array('jquery'), $this->version, false);
+            wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/zwivel-toc-public.js', array('jquery'), rand(1, 99999), false);
         }
 
     }
@@ -119,7 +119,7 @@ class Zwivel_Toc_Public
 
         $tocOff = get_post_meta($post->ID, '_zwivel-toc-off', true);
 
-        // bail if feed, search or archive
+        // bail if feed, search, archive or toc is turned off by admin
         if ( is_feed() || is_search() || is_archive() || $tocOff) {
             return $content;
         }
@@ -129,11 +129,7 @@ class Zwivel_Toc_Public
         $find = $this->shared->getHeadings();
         $replace = $this->shared->getHeadingsWithAnchors();
 
-//        $hTags = $this->shared->prepareHTags();
-//        $html = $this->getTOC($hTags);
-
         return Zwivel_Toc_Shared::mb_find_replace( $find, $replace, $content );
-//        return $html . Zwivel_Toc_Shared::mb_find_replace( $find, $replace, $content );
     }
 
 

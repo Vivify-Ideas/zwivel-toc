@@ -169,6 +169,8 @@ class Zwivel_Toc {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'add_meta_boxes_post', $plugin_admin, 'adding_custom_meta_boxes' );
 		$this->loader->add_action( 'save_post', $plugin_admin, 'save', 10, 3 );
+        $this->loader->add_action( 'wp_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
+        $this->loader->add_action( 'wp_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
 	}
 
@@ -190,7 +192,6 @@ class Zwivel_Toc {
         $this->loader->add_action( 'enqueue_styles', $plugin_public, 'enqueue_styles' );
         $this->loader->add_action( 'widgets_init', $plugin_public, 'register_zwivel_toc_widget' );
         $this->loader->add_filter( 'the_content', $plugin_public, 'the_content', 100 );
-
 
 	}
 

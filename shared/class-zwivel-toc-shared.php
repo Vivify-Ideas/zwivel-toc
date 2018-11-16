@@ -167,9 +167,6 @@ class Zwivel_Toc_Shared
 
 
     public function prepareHTags($tagsFromDb) {
-//        global $post;
-//
-//        $hTagsFromDB = get_post_meta( $post->ID, '_zwivel-toc-h-tags', TRUE );
         $hTags = [];
 
         for ($i = 0; $i < count($tagsFromDb['headings']); $i++) {
@@ -188,13 +185,14 @@ class Zwivel_Toc_Shared
             $hTags[$i]['id'] = $tagsFromDb['ids'][$i];
         }
 
+        if (isset($tagsFromDb['exclude'])) {
+            for ($i = 0; $i < count($tagsFromDb['exclude']); $i++) {
+                $hTags[$i]['exclude'] = $tagsFromDb['exclude'][$i];
+            }
+        }
+
         return $hTags;
     }
-
-
-
-
-
 
 
     public function getTOC($hTags)
@@ -226,10 +224,8 @@ class Zwivel_Toc_Shared
     {
         $html = '';
 
-//        if ( $this->hasTOCItems ) {
         $html .= $this->createTOC( $hTags );
-        $html  = '<ul class="toc_widget_list no_bullets ez-toc-list">' . $html . '</ul>';
-//        }
+        $html  = '<ul class="toc_widget_list no_bullets zw-toc-list">' . $html . '</ul>';
 
         return $html;
     }
@@ -264,6 +260,10 @@ class Zwivel_Toc_Shared
         $numbered_items_min = $current_depth;
 
         for ( $i = 0; $i < count( $hTags ); $i ++ ) {
+
+            if (!empty($hTags[$i]['exclude']) && $hTags[$i]['exclude'] != 0) {
+                continue;
+            }
 
             if ( $current_depth == (int) $hTags[ $i ]['heading'] ) {
 
@@ -352,9 +352,6 @@ class Zwivel_Toc_Shared
     {
         return '#' . $id;
     }
-
-
-
 
 
     /**
