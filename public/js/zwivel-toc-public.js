@@ -42,6 +42,7 @@
     var headerOffset = 150;
     var nextId;
     var previousId;
+    var previousItem;
 
 
     $(window).scroll(function() {
@@ -51,13 +52,17 @@
         if ($(window).scrollTop() >= $(item).offset().top - headerOffset) {
 
           nextId = contentHTags.eq(index + 1).attr('id');
-          previousId = contentHTags.eq(index - 1).attr('id');
 
-          var id = $(this).attr('id');
-          markCurrentItemInDropdown(id);
+          previousItem = contentHTags[index - 1];
+          if (previousItem) {
+            previousId = contentHTags.eq(index - 1).attr('id');
+          }
+
+          markCurrentItemInDropdown($(this).attr('id'));
 
           setCurrentAndNextTitleInStickyTOC(index, item);
           handleStickyHeaderNextButtonAppearance();
+          handleStickyHeaderPreviousButtonAppearance();
         }
       })
     });
@@ -95,12 +100,22 @@
       }
     }
 
+    function handleStickyHeaderPreviousButtonAppearance() {
+      if (!previousItem) {
+        stickyTOCHeaderPreviousBtn.addClass('disabled');
+      } else {
+        stickyTOCHeaderPreviousBtn.removeClass('disabled');
+      }
+    }
+
 
     /******************/
     /* click handlers */
     /******************/
     stickyTOCHeaderPreviousBtn.click(function() {
-      scrollToID(previousId);
+      if (previousId) {
+        scrollToID(previousId);
+      }
     });
 
     stickyTOCHeaderNextBtn.click(function() {
@@ -111,14 +126,12 @@
 
     $('.zw-toc-list li a').click(function(e) {
       e.preventDefault();
-      var currentId = $(this).attr('href');
-      scrollToCurrentHeading(currentId);
+      scrollToCurrentHeading($(this).attr('href'));
     });
 
     $('.zw-c-toc-dropdown-menu li:not(.zw-u-first) a').click(function(e) {
       e.preventDefault();
-      var currentId = $(this).attr('href');
-      scrollToCurrentHeading(currentId);
+      scrollToCurrentHeading($(this).attr('href'));
     });
 
 
