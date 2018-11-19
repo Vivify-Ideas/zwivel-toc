@@ -89,10 +89,9 @@
 .zw-c-toc-dropdown {
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: normal;
+    white-space: nowrap;
 }
 
-.zw-c-toc-dropdown:hover .zw-c-toc-dropdown-menu,
 .zw-c-toc-dropdown.zw-is-active .zw-c-toc-dropdown-menu {
     display: block;
 }
@@ -111,7 +110,7 @@
     font-size: 13px;
     list-style: none;
     overflow: visible;
-    white-space: unset;
+    white-space: normal;
     background-color: #1eb798;
 }
 
@@ -139,6 +138,12 @@
 .zw-c-toc-dropdown-menu > li > a {
     display: block;
     padding: 0.5rem;
+}
+
+@media (min-width: 769px) {
+    .zw-c-toc-dropdown-menu > li.zw-u-first .zw-c-toc-dropdown-menu-close {
+        display: none;
+    }
 }
 
 .zw-c-toc-pagination {

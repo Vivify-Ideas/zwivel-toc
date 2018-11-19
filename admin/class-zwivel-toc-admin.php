@@ -147,7 +147,7 @@ class Zwivel_Toc_Admin {
                 echo '<input type="hidden" name="h-tags[headings][' . $i . ']" value="' . $hTags[$i]['heading'] . '">';
                 echo '<input type="hidden" name="h-tags[ids][' . $i . ']" value="' . $hTags[$i]['id'] . '">';
                 echo '<input type="hidden" name="h-tags[default_values][' . $i . ']" value="' . $hTags[$i]['default_value'] . '">';
-                echo '<input type="text" name="h-tags[values][' . $i . ']" value="' . $hTags[$i]['value'] . '">';
+                echo '<input type="text" name="h-tags[values][' . $i . ']" value="' . (!empty($hTags[$i]['value']) ? $hTags[$i]['value'] : $hTags[$i]['default_value']) . '">';
                 echo '<small>#' . str_replace( ' ', '_', $hTags[$i]['default_value'] )  . '</small>';
 
                 echo '</div>';

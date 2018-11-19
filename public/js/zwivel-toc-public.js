@@ -39,11 +39,15 @@
     var stickyTOCHeaderNextTitle = $('.zw-c-toc-chapter-next');
     var stickyTOCHeaderNextBtn = $('.zw-c-btn-next');
     var stickyTOCHeaderPreviousBtn = $('.zw-c-btn-previous');
+    var dropdown = $('.zw-c-toc-dropdown');
+    var dropdownMenu =$('.zw-c-toc-dropdown-menu');
+    var dropdownCloseBtn = $('.zw-c-toc-dropdown-menu-close');
+    var dropdownToggleBtn = $('.zw-c-toc-dropdown .zw-c-btn');
+    var sidebarTOCItems = $('.zw-toc-list li a');
     var headerOffset = 150;
     var nextId;
     var previousId;
     var previousItem;
-
 
     $(window).scroll(function() {
       toggleStickyTOC();
@@ -86,8 +90,22 @@
     }
 
     function setCurrentAndNextTitleInStickyTOC(index, item) {
-      stickyTOCHeaderTitle.text($(item).text());
+      var titleValue = getStickyTOCTitle(item) ? getStickyTOCTitle(item) : $(item).text();
+
+      stickyTOCHeaderTitle.text(titleValue);
       stickyTOCHeaderNextTitle.text(contentHTags.eq(index + 1).text());
+    }
+
+    function getStickyTOCTitle(item) {
+      var titleValue = '';
+
+      sidebarTOCItems.each(function(sidebarTocIndex, sidebarTocItem) {
+        if ($(sidebarTocItem).attr('href').substring(1) === $(item).attr('id')) {
+          titleValue = $(sidebarTocItem).text();
+        }
+      });
+
+      return titleValue;
     }
 
     function handleStickyHeaderNextButtonAppearance() {
@@ -124,7 +142,7 @@
       }
     });
 
-    $('.zw-toc-list li a').click(function(e) {
+    sidebarTOCItems.click(function(e) {
       e.preventDefault();
       scrollToCurrentHeading($(this).attr('href'));
     });
@@ -132,8 +150,28 @@
     $('.zw-c-toc-dropdown-menu li:not(.zw-u-first) a').click(function(e) {
       e.preventDefault();
       scrollToCurrentHeading($(this).attr('href'));
+      dropdown.removeClass('zw-is-active');
     });
 
+    // mobile ****************************
+    dropdownToggleBtn.click(function() {
+      dropdown.addClass('zw-is-active');
+    });
+
+    dropdownCloseBtn.click(function() {
+      dropdown.removeClass('zw-is-active');
+    });
+    //************************************
+
+    // desktop ***************************
+    dropdownToggleBtn.hover(function() {
+      dropdown.addClass('zw-is-active');
+    });
+
+    dropdownMenu.mouseleave(function() {
+      dropdown.removeClass('zw-is-active');
+    });
+    //************************************
 
 
     function scrollToID(id) {
