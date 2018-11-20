@@ -29,6 +29,7 @@
 	 * practising this, we should strive to set a better example in our own work.
 	 */
 
+
 	$(function() {
 
     var sidebarTOC = $('#zwivel-toc-container');
@@ -40,36 +41,102 @@
     var stickyTOCHeaderNextBtn = $('.zw-c-btn-next');
     var stickyTOCHeaderPreviousBtn = $('.zw-c-btn-previous');
     var dropdown = $('.zw-c-toc-dropdown');
-    var dropdownMenu =$('.zw-c-toc-dropdown-menu');
+    var dropdownMenu = $('.zw-c-toc-dropdown-menu');
     var dropdownCloseBtn = $('.zw-c-toc-dropdown-menu-close');
     var dropdownToggleBtn = $('.zw-c-toc-dropdown .zw-c-btn');
     var sidebarTOCItems = $('.zw-toc-list li a');
     var headerOffset = 150;
-    var nextId;
-    var previousId;
-    var previousItem;
+    var next;
+    var previous;
 
-    $(window).scroll(function() {
-      toggleStickyTOC();
+    var sidebarTocHrefs = [];
+    for (var i = 0; i < sidebarTOCItems.length; i++) {
+      sidebarTocHrefs.push(sidebarTOCItems[i].hash.substr(1));
+    }
 
-      contentHTags.each(function(index, item) {
-        if ($(window).scrollTop() >= $(item).offset().top - headerOffset) {
+    handleScrolling();
 
-          nextId = contentHTags.eq(index + 1).attr('id');
 
-          previousItem = contentHTags[index - 1];
-          if (previousItem) {
-            previousId = contentHTags.eq(index - 1).attr('id');
+
+
+    /******************/
+    /*   functions    */
+    /******************/
+    function handleScrolling() {
+      $(window).scroll(function() {
+        toggleStickyTOC();
+
+        var lastPassedTocTagOffset = Number.NEGATIVE_INFINITY;
+        var lastPassedTocTag = null;
+
+        contentHTags.each(function(index, item) {
+          var currentHTagId = contentHTags.eq(index).attr('id');
+          if ($.inArray(currentHTagId, sidebarTocHrefs) !== -1) {
+            var tagOffset = $(item).offset().top - headerOffset - $(window).scrollTop();
+            if (tagOffset <= 0 && tagOffset > lastPassedTocTagOffset) {
+              lastPassedTocTagOffset = tagOffset;
+              lastPassedTocTag = contentHTags.eq(index);
+              next = getNext(index, sidebarTocHrefs);
+              previous = getPrevious(index, sidebarTocHrefs);
+            }
           }
+        });
 
-          markCurrentItemInDropdown($(this).attr('id'));
-
-          setCurrentAndNextTitleInStickyTOC(index, item);
-          handleStickyHeaderNextButtonAppearance();
-          handleStickyHeaderPreviousButtonAppearance();
+        if (lastPassedTocTag) {
+          var currentHeading = getCorrectTextForStickyTOC(lastPassedTocTag);
+          stickyTOCHeaderTitle.text(currentHeading.text());
         }
-      })
-    });
+
+        if (next) {
+          var element = getCorrectTextForStickyTOC(next);
+          stickyTOCHeaderNextTitle.text(element.text());
+        }
+
+        if (lastPassedTocTag) {
+          markCurrentItemInDropdown(lastPassedTocTag.attr('id'));
+        }
+
+        handleStickyHeaderNextButtonAppearance();
+        handleStickyHeaderPreviousButtonAppearance();
+
+      });
+    }
+
+
+
+    function getCorrectTextForStickyTOC(headingFromContent) {
+      return sidebarTOCItems.filter(function(index, el) {
+        return $(el).attr('href').substr(1) === headingFromContent.attr('id');
+      });
+    }
+
+
+    function getNext(index, ids) {
+      if (index > ids.length) {
+        return;
+      }
+
+      if ($.inArray(contentHTags.eq(index + 1).attr('id'), sidebarTocHrefs) !== -1) {
+        return contentHTags.eq(index + 1);
+      }
+
+      index++;
+      return getNext(index, ids);
+    }
+
+
+    function getPrevious(index, ids) {
+      if (index <= 0) {
+        return;
+      }
+
+      if ($.inArray(contentHTags.eq(index - 1).attr('id'), sidebarTocHrefs) !== -1) {
+        return $(contentHTags[index - 1]);
+      }
+
+      index--;
+      return getPrevious(index, ids);
+    }
 
 
     function toggleStickyTOC() {
@@ -89,27 +156,8 @@
       $('.zw-c-toc-dropdown-menu li a[href=#'+ id +']').addClass('zw-c-toc-dropdown-menu-current');
     }
 
-    function setCurrentAndNextTitleInStickyTOC(index, item) {
-      var titleValue = getStickyTOCTitle(item) ? getStickyTOCTitle(item) : $(item).text();
-
-      stickyTOCHeaderTitle.text(titleValue);
-      stickyTOCHeaderNextTitle.text(contentHTags.eq(index + 1).text());
-    }
-
-    function getStickyTOCTitle(item) {
-      var titleValue = '';
-
-      sidebarTOCItems.each(function(sidebarTocIndex, sidebarTocItem) {
-        if ($(sidebarTocItem).attr('href').substring(1) === $(item).attr('id')) {
-          titleValue = $(sidebarTocItem).text();
-        }
-      });
-
-      return titleValue;
-    }
-
     function handleStickyHeaderNextButtonAppearance() {
-      if (!nextId) {
+      if (!next) {
         stickyTOCHeaderNextBtn.addClass('disabled');
         stickyTOCHeaderNextHolder.text('');
       } else {
@@ -119,7 +167,7 @@
     }
 
     function handleStickyHeaderPreviousButtonAppearance() {
-      if (!previousItem) {
+      if (!previous) {
         stickyTOCHeaderPreviousBtn.addClass('disabled');
       } else {
         stickyTOCHeaderPreviousBtn.removeClass('disabled');
@@ -131,14 +179,14 @@
     /* click handlers */
     /******************/
     stickyTOCHeaderPreviousBtn.click(function() {
-      if (previousId) {
-        scrollToID(previousId);
+      if (previous.attr('id')) {
+        scrollToID(previous);
       }
     });
 
     stickyTOCHeaderNextBtn.click(function() {
-      if (nextId) {
-        scrollToID(nextId)
+      if (next.attr('id')) {
+        scrollToID(next)
       }
     });
 
@@ -163,6 +211,7 @@
     });
     //************************************
 
+
     // desktop ***************************
     dropdownToggleBtn.hover(function() {
       dropdown.addClass('zw-is-active');
@@ -174,11 +223,13 @@
     //************************************
 
 
-    function scrollToID(id) {
+
+    function scrollToID(item) {
       $('html, body').animate({
-        scrollTop: $('#' + id).offset().top - headerOffset + 1
+        scrollTop: $('#' + item.attr('id')).offset().top - headerOffset + 1
       }, 500);
     }
+
 
     function scrollToCurrentHeading(currentId) {
       $('html, body').animate({
