@@ -54,54 +54,66 @@
       sidebarTocHrefs.push(sidebarTOCItems[i].hash.substr(1));
     }
 
-    handleScrolling();
-
-
 
 
     /******************/
     /*   functions    */
     /******************/
-    function handleScrolling() {
-      $(window).scroll(function() {
-        toggleStickyTOC();
 
-        var lastPassedTocTagOffset = Number.NEGATIVE_INFINITY;
-        var lastPassedTocTag = null;
+    var handleScroll = function() {
+      toggleStickyTOC();
 
-        contentHTags.each(function(index, item) {
-          var currentHTagId = contentHTags.eq(index).attr('id');
-          if ($.inArray(currentHTagId, sidebarTocHrefs) !== -1) {
-            var tagOffset = $(item).offset().top - headerOffset - $(window).scrollTop();
-            if (tagOffset <= 0 && tagOffset > lastPassedTocTagOffset) {
-              lastPassedTocTagOffset = tagOffset;
-              lastPassedTocTag = contentHTags.eq(index);
-              next = getNext(index, sidebarTocHrefs);
-              previous = getPrevious(index, sidebarTocHrefs);
-            }
-          }
-        });
+      var lastPassedTocTagOffset = Number.NEGATIVE_INFINITY;
+      var lastPassedTocTag = null;
 
-        if (lastPassedTocTag) {
-          var currentHeading = getCorrectTextForStickyTOC(lastPassedTocTag);
-          stickyTOCHeaderTitle.text(currentHeading.text());
+      contentHTags.each(function(index, item) {
+        var currentHTagId = contentHTags.eq(index).attr('id');
+
+        if ($.inArray(currentHTagId, sidebarTocHrefs) === -1) {
+          return;
         }
 
-        if (next) {
-          var element = getCorrectTextForStickyTOC(next);
-          stickyTOCHeaderNextTitle.text(element.text());
+        var tagOffset = $(item).offset().top - headerOffset - $(window).scrollTop();
+
+        if (tagOffset <= 0 && tagOffset > lastPassedTocTagOffset) {
+          lastPassedTocTagOffset = tagOffset;
+          lastPassedTocTag = contentHTags.eq(index);
+          next = getNext(index, sidebarTocHrefs);
+          previous = getPrevious(index, sidebarTocHrefs);
         }
-
-        if (lastPassedTocTag) {
-          markCurrentItemInDropdown(lastPassedTocTag.attr('id'));
-        }
-
-        handleStickyHeaderNextButtonAppearance();
-        handleStickyHeaderPreviousButtonAppearance();
-
       });
+
+      setCurrentHeadingTextInStickyTOC(lastPassedTocTag);
+      setNextHeadingTextInStickyTOC(next);
+
+      if (lastPassedTocTag) {
+        markCurrentItemInDropdown(lastPassedTocTag.attr('id'));
+      }
+
+      handleStickyHeaderNextButtonAppearance();
+      handleStickyHeaderPreviousButtonAppearance();
+    };
+
+
+    function setCurrentHeadingTextInStickyTOC(lastPassedTocTag) {
+      if (!lastPassedTocTag) {
+        return;
+      }
+
+      var currentHeading = getCorrectTextForStickyTOC(lastPassedTocTag);
+      stickyTOCHeaderTitle.text(currentHeading.text());
     }
 
+
+    function setNextHeadingTextInStickyTOC(next) {
+      if (!next) {
+        stickyTOCHeaderNextTitle.text('');
+        return;
+      }
+
+      var element = getCorrectTextForStickyTOC(next);
+      stickyTOCHeaderNextTitle.text(element.text());
+    }
 
 
     function getCorrectTextForStickyTOC(headingFromContent) {
@@ -151,10 +163,12 @@
       }
     }
 
+
     function markCurrentItemInDropdown(id) {
       $('.zw-c-toc-dropdown-menu li a').removeClass('zw-c-toc-dropdown-menu-current');
       $('.zw-c-toc-dropdown-menu li a[href=#'+ id +']').addClass('zw-c-toc-dropdown-menu-current');
     }
+
 
     function handleStickyHeaderNextButtonAppearance() {
       if (!next) {
@@ -165,6 +179,7 @@
         stickyTOCHeaderNextHolder.text('Next:');
       }
     }
+
 
     function handleStickyHeaderPreviousButtonAppearance() {
       if (!previous) {
@@ -184,16 +199,19 @@
       }
     });
 
+
     stickyTOCHeaderNextBtn.click(function() {
       if (next.attr('id')) {
         scrollToID(next)
       }
     });
 
+
     sidebarTOCItems.click(function(e) {
       e.preventDefault();
       scrollToCurrentHeading($(this).attr('href'));
     });
+
 
     $('.zw-c-toc-dropdown-menu li:not(.zw-u-first) a').click(function(e) {
       e.preventDefault();
@@ -201,10 +219,12 @@
       dropdown.removeClass('zw-is-active');
     });
 
+
     // mobile ****************************
     dropdownToggleBtn.click(function() {
       dropdown.addClass('zw-is-active');
     });
+
 
     dropdownCloseBtn.click(function() {
       dropdown.removeClass('zw-is-active');
@@ -216,6 +236,7 @@
     dropdownToggleBtn.hover(function() {
       dropdown.addClass('zw-is-active');
     });
+
 
     dropdownMenu.mouseleave(function() {
       dropdown.removeClass('zw-is-active');
@@ -236,6 +257,23 @@
         scrollTop: $(currentId).offset().top - headerOffset + 1
       }, 500);
     }
+
+
+
+    /******************/
+    /* MAIN EXECUTION */
+    /******************/
+
+    function initScrolling() {
+      $(window).on('scroll', handleScroll);
+    }
+
+    initScrolling();
+
+    window.onload = function() {
+      handleScroll();
+    };
+
 
   });
 
