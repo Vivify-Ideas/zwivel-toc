@@ -45,7 +45,7 @@
     var dropdownCloseBtn = $('.zw-c-toc-dropdown-menu-close');
     var dropdownToggleBtn = $('.zw-c-toc-dropdown .zw-c-btn');
     var sidebarTOCItems = $('.zw-toc-list li a');
-    var headerOffset = 150;
+    var headerAddedOffset = 75;
     var next;
     var previous;
 
@@ -73,7 +73,7 @@
           return;
         }
 
-        var tagOffset = $(item).offset().top - headerOffset - $(window).scrollTop();
+        var tagOffset = $(item).offset().top - getHeaderOffset() - $(window).scrollTop();
 
         if (tagOffset <= 0 && tagOffset > lastPassedTocTagOffset) {
           lastPassedTocTagOffset = tagOffset;
@@ -202,7 +202,7 @@
 
     stickyTOCHeaderNextBtn.click(function() {
       if (next.attr('id')) {
-        scrollToID(next)
+        scrollToID(next);
       }
     });
 
@@ -243,18 +243,27 @@
     });
     //************************************
 
+    function getHeaderOffset() {
+      var height = $('#header').height();
+
+      if (stickyTOCHeader.css('display') === 'none') {
+        height = height + stickyTOCHeader.height();
+      }
+
+      return height + headerAddedOffset;
+    }
 
 
     function scrollToID(item) {
       $('html, body').animate({
-        scrollTop: $('#' + item.attr('id')).offset().top - headerOffset + 1
+        scrollTop: $('#' + item.attr('id')).offset().top - getHeaderOffset() + 1
       }, 500);
     }
 
 
     function scrollToCurrentHeading(currentId) {
       $('html, body').animate({
-        scrollTop: $(currentId).offset().top - headerOffset + 1
+        scrollTop: $(currentId).offset().top - getHeaderOffset() + 1
       }, 500);
     }
 
@@ -263,6 +272,8 @@
     /******************/
     /* MAIN EXECUTION */
     /******************/
+
+    getHeaderOffset();
 
     function initScrolling() {
       $(window).on('scroll', handleScroll);
