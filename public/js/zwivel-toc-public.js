@@ -119,7 +119,7 @@
     function getCorrectTextForStickyTOC(headingFromContent) {
       return sidebarTOCItems.filter(function(index, el) {
         return $(el).attr('href').substr(1) === headingFromContent.attr('id');
-      });
+      }).first();
     }
 
 
