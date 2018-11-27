@@ -32,6 +32,7 @@ class Zwivel_Toc_Shared
     {
         $matches = $this->extractHeadingsFromHTML($content);
         $matches = $this->removeEmptyHeadings($matches);
+        $matches = $this->removeHeadings($matches);
 
         return $this->headingIDs($matches);
     }
@@ -64,6 +65,31 @@ class Zwivel_Toc_Shared
 
             $matches = $new_matches;
         }
+
+        return $matches;
+    }
+
+
+    private function removeHeadings( &$matches ) {
+
+        $levels = get_option( 'zwivel-toc-settings', array() );
+        $levels = array_filter($levels, function($level) { return $level != 0; });
+
+//        if ( count( $levels ) != 6 ) {
+
+            $new_matches = array();
+            $count       = count( $matches );
+
+            for ( $i = 0; $i < $count; $i++ ) {
+
+                if ( in_array( $matches[ $i ][2], $levels ) ) {
+
+                    $new_matches[] = $matches[ $i ];
+                }
+            }
+
+            $matches = $new_matches;
+//        }
 
         return $matches;
     }

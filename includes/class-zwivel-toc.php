@@ -171,6 +171,9 @@ class Zwivel_Toc {
 		$this->loader->add_action( 'save_post', $plugin_admin, 'save', 10, 3 );
         $this->loader->add_action( 'wp_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
         $this->loader->add_action( 'wp_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+        $this->loader->add_action( 'admin_menu', $plugin_admin, 'zwivel_toc_register_settings' );
+        $this->loader->add_action( 'admin_menu', $plugin_admin, 'zwivel_toc_register_options_page' );
+        $this->loader->add_action( 'admin_post_update_zwivel_toc_settings', $plugin_admin, 'zwivel_toc_update_options_page' );
 
 	}
 

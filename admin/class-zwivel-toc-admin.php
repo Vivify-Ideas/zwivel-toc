@@ -56,6 +56,13 @@ class Zwivel_Toc_Admin {
 
 	}
 
+    private static function getDefaults()
+    {
+        return array(
+            'heading_levels' => array('1', '2', '3', '4', '5', '6'),
+        );
+    }
+
 	/**
 	 * Register the stylesheets for the admin area.
 	 *
@@ -104,6 +111,37 @@ class Zwivel_Toc_Admin {
 	}
 
 
+	public function zwivel_toc_register_settings()
+    {
+        if ( FALSE === get_option( 'zwivel-toc-settings' ) ) {
+            add_option( 'zwivel-toc-settings', self::getDefaults() );
+        }
+
+        register_setting( 'zwivel-toc-settings', 'zwivel-toc-settings-main-options' );
+    }
+
+
+    public function zwivel_toc_register_options_page()
+    {
+        add_options_page('Zwivel TOC Settings', 'Zwivel TOC', 'manage_options', 'zwivel-toc', array($this, 'zwivel_toc_options_page'));
+    }
+
+    public function zwivel_toc_options_page()
+    {
+        include_once('partials/zwivel-toc-admin-settings.php');
+    }
+
+    public function zwivel_toc_update_options_page()
+    {
+        if (isset($_POST['zwivel-toc-settings']['heading_levels'])) {
+            update_option('zwivel-toc-settings', $_POST['zwivel-toc-settings']['heading_levels']);
+        }
+
+        wp_redirect( $_SERVER['HTTP_REFERER'] );
+        exit();
+    }
+
+
 	public function adding_custom_meta_boxes()
     {
         add_meta_box(
@@ -127,7 +165,6 @@ class Zwivel_Toc_Admin {
         echo '<div class="zw-toc-admin-checkbox">';
         echo '<label><input type="checkbox" value="1" ' . $checked . ' name="zwivel-toc-off" />Turn off TOC for this post</label>';
         echo '</div>';
-
 
         $hTagsFromDB = get_post_meta( $post->ID, '_zwivel-toc-h-tags', TRUE );
 
