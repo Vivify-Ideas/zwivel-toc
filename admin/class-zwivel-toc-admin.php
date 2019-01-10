@@ -154,7 +154,6 @@ class Zwivel_Toc_Admin {
         );
     }
 
-
     public function table_of_contents()
     {
         global $post;
@@ -170,6 +169,7 @@ class Zwivel_Toc_Admin {
 
         if (!empty($hTagsFromDB)) {
             $hTags = $this->shared->prepareHTags($hTagsFromDB);
+            $hTags = $this->shared->removeHeadingsDeselectedInSettings($hTags);
 
             for ($i = 0; $i < count($hTags); $i++) {
 

@@ -43,44 +43,12 @@ class Zwivel_TOC_Widget extends WP_Widget {
         if (!empty($hTagsFromDB)) {
 
              $hTags = $this->shared->prepareHTags($hTagsFromDB);
-
-             // @TODO treba implementirati
-//            $hTags = $this->removeHeadings($hTagsFromDB);
+             $hTags = $this->shared->removeHeadingsDeselectedInSettings($hTags);
 
             echo $this->shared->getTOC($hTags);
 
         }
 	}
-
-
-	/* @TODO F-ja preuzeta iz shared - treba je doraditi da filtrira i vraca odredjeni format */
-    private function removeHeadings( &$matches ) {
-
-        $levels = get_option( 'zwivel-toc-settings', array() );
-        $levels = array_filter($levels, function($level) { return $level != 0; });
-
-        echo '<pre>';
-        var_dump($matches);
-        echo '</pre>';
-
-//        if ( count( $levels ) != 6 ) {
-
-            $new_matches = array();
-            $count       = count( $matches );
-
-            for ( $i = 0; $i < $count; $i++ ) {
-
-                if ( in_array( $matches[ $i ]['headings'], $levels ) ) {
-
-                    $new_matches[] = $matches[ $i ];
-                }
-            }
-
-            $matches = $new_matches;
-//        }
-
-        return $matches;
-    }
 
 	/**
 	 * Back-end widget form.
