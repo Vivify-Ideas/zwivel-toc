@@ -32,7 +32,7 @@ class Zwivel_Toc_Shared
     {
         $matches = $this->extractHeadingsFromHTML($content);
         $matches = $this->removeEmptyHeadings($matches);
-        $matches = $this->removeHeadings($matches);
+       // $matches = $this->removeHeadings($matches);
 
         return $this->headingIDs($matches);
     }
