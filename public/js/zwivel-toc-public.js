@@ -45,9 +45,9 @@
     var dropdownCloseBtn = $('.zw-c-toc-dropdown-menu-close');
     var dropdownToggleBtn = $('.zw-c-toc-dropdown .zw-c-btn');
     var sidebarTOCItems = $('.zw-toc-list li a');
-    var headerAddedOffset = 75;
     var next;
     var previous;
+    var wpadminbar = $('#wpadminbar');
 
     var sidebarTocHrefs = [];
     for (var i = 0; i < sidebarTOCItems.length; i++) {
@@ -245,12 +245,9 @@
 
     function getHeaderOffset() {
       var height = $('#header').height();
-
-      if (stickyTOCHeader.css('display') === 'none') {
-        height = height + stickyTOCHeader.height();
-      }
-
-      return height + headerAddedOffset;
+      height += wpadminbar.height();
+      height += stickyTOCHeader.height();
+      return height;
     }
 
 
