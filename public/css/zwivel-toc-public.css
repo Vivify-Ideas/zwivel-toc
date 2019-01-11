@@ -109,7 +109,8 @@
     color: #ffffff;
     font-size: 13px;
     list-style: none;
-    overflow: visible;
+    overflow: auto;
+    max-height: calc(100vh - 10rem);
     white-space: normal;
     background-color: #1eb798;
 }
