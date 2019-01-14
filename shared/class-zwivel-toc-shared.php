@@ -74,7 +74,7 @@ class Zwivel_Toc_Shared
 
         $headingTagsToExclude = array();
         foreach ($tocSettings as $key=>$value) {
-            if($value === "0") {
+            if(empty($value)) {
                 array_push($headingTagsToExclude, $key);
             }
         }
