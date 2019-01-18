@@ -68,6 +68,28 @@ class Zwivel_Toc_Shared
         return $matches;
     }
 
+    public function removeHeadingsDeselectedInSettings($hTags)
+    {
+        $tocSettings = get_option('zwivel-toc-settings');
+
+        $headingTagsToExclude = array();
+        foreach ($tocSettings as $key => $tocSetting) {
+            if (empty($tocSetting)) {
+                array_push($headingTagsToExclude, $key);
+            }
+        }
+
+        $finalHeadings = array();
+        foreach ($hTags as $hTag) {
+            if (!in_array($hTag['heading'], $headingTagsToExclude)) {
+                array_push($finalHeadings, $hTag);
+            }
+        }
+
+        return $finalHeadings;
+    }
+
+
     public function headingIDs(&$matches)
     {
         $count = count($matches);

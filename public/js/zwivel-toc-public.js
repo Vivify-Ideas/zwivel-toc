@@ -124,7 +124,7 @@
 
 
     function getNext(index, ids) {
-      if (index > ids.length) {
+      if (index > contentHTags.length) {
         return;
       }
 

@@ -141,7 +141,7 @@ class Zwivel_Toc_Public
 
         if (!empty($hTagsFromDB)) {
             $hTags = $this->shared->prepareHTags($hTagsFromDB);
-
+            $hTags = $this->shared->removeHeadingsDeselectedInSettings($hTags);
             echo $this->shared->createTOC($hTags);
         }
 
