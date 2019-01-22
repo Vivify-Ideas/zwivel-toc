@@ -223,7 +223,7 @@ class Zwivel_Toc_Shared
         // add container, toc title and list items
         $html .= '<div id="zwivel-toc-container" class="sidebar-widget zw-toc-container clearfix">' . PHP_EOL;
 
-        $html .= '<div class="widget-title-wrapper zwivel-toc-title-container">' . PHP_EOL;
+        $html .= '<div class="widget-title-wrapper zwivel-toc-title-container zw-toc-title-container--hidden">' . PHP_EOL;
 
         $html .= '<h3 class="widget-title zwivel-toc-title">CONTENTS</h3>' . PHP_EOL;
 
@@ -246,7 +246,7 @@ class Zwivel_Toc_Shared
         $html = '';
 
         $html .= $this->createTOC( $hTags );
-        $html  = '<ul class="toc_widget_list no_bullets zw-toc-list">' . $html . '</ul>';
+        $html  = '<ul class="toc_widget_list no_bullets zw-toc-list zwivel-toc-title--hidden">' . $html . '</ul>';
 
         return $html;
     }
