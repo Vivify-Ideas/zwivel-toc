@@ -63,6 +63,12 @@
     background-color: #0d7c7c;
 }
 
+@media(max-width: 768px) {
+    .zw-c-toc .zw-c-btn:hover {
+        background-color: #178b74;
+    }
+}
+
 .zw-c-toc .zw-c-btn.disabled {
     pointer-events: none;
     cursor: not-allowed;
@@ -190,4 +196,14 @@
 
 .zwivel-toc-section {
     padding-top:15px;
+}
+
+@media(max-width: 768px) {
+	.zw-toc-title-container--hidden {
+		display: none;
+	}
+
+	.zwivel-toc-title--hidden {
+		display: none;
+	}
 }
