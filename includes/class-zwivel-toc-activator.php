@@ -30,7 +30,35 @@ class Zwivel_Toc_Activator {
 	 * @since    1.0.0
 	 */
 	public static function activate() {
-
+	    Zwivel_Toc_Activator::saveHeadings();
 	}
+
+	private static function saveHeadings() {
+	    $shared = new Zwivel_Toc_Shared();
+        $posts = get_posts([
+            'numberposts' => -1,
+        ]);
+        foreach ($posts as $post) {
+            $zwivelTocHTags = get_post_meta($post->ID, '_zwivel-toc-h-tags', true);
+            if(empty($zwivelTocHTags)) {
+                $headings = $shared->extractHeadings($post->post_content);
+                $formattedHeadingData = [
+                    'exclude'           => [],
+                    'headings'          => [],
+                    'ids'               => [],
+                    'default_values'    => [],
+                    'values'            => []
+                ];
+                foreach ($headings as $heading) {
+                    array_push($formattedHeadingData['exclude'], "0");
+                    array_push($formattedHeadingData['headings'], $heading[2]);
+                    array_push($formattedHeadingData['ids'], $heading['id']);
+                    array_push($formattedHeadingData['default_values'], $heading[3]);
+                    array_push($formattedHeadingData['values'], $heading[3]);
+                }
+                update_post_meta($post->ID, '_zwivel-toc-h-tags', $formattedHeadingData);
+            }
+        }
+    }
 
 }
