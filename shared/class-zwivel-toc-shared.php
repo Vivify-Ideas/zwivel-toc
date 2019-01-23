@@ -432,5 +432,18 @@ class Zwivel_Toc_Shared
         return $string;
     }
 
+    /**
+     * Wrapper function used to update TOC meta fields
+     *
+     * @param $post
+     * @param $formattedHeadingData
+     */
+    public function updateTocMetaFields($post, $formattedHeadingData) {
+        if (empty($formattedHeadingData)) {
+            update_post_meta( $post->ID, '_zwivel-toc-off', 1 );
+        } else {
+            update_post_meta($post->ID, '_zwivel-toc-h-tags', $formattedHeadingData);
+        }
+    }
 
 }
