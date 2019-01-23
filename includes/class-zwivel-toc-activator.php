@@ -43,7 +43,7 @@ class Zwivel_Toc_Activator {
             if (empty($zwivelTocHTags)) {
                 $headings = $shared->extractHeadings($post->post_content);
                 $formattedHeadingData = Zwivel_Toc_Activator::formatHeadings($headings);
-                Zwivel_Toc_Activator::updateTocMetaFields($post, $formattedHeadingData);
+                $shared->updateTocMetaFields($post, $formattedHeadingData);
             }
         }
     }
@@ -67,14 +67,6 @@ class Zwivel_Toc_Activator {
             array_push($formattedHeadingData['values'], $heading[3]);
         }
         return $formattedHeadingData;
-    }
-
-    private static function updateTocMetaFields($post, $formattedHeadingData) {
-        if (empty($formattedHeadingData)) {
-            update_post_meta( $post->ID, '_zwivel-toc-off', 1 );
-        } else {
-            update_post_meta($post->ID, '_zwivel-toc-h-tags', $formattedHeadingData);
-        }
     }
 
 }

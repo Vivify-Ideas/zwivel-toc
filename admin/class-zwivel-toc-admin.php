@@ -225,11 +225,11 @@ class Zwivel_Toc_Admin {
     public function save($post_id, $post, $update)
     {
         if ( isset( $_REQUEST['h-tags'] ) && !empty( $_REQUEST['h-tags'] ) ) {
-            update_post_meta( $post_id, '_zwivel-toc-h-tags', $_REQUEST['h-tags'] );
+            $this->shared->updateTocMetaFields($post, $_REQUEST['h-tags']);
         }
 
         if ( isset( $_REQUEST['zwivel-toc-off'] ) && !empty( $_REQUEST['zwivel-toc-off'] ) ) {
-            update_post_meta( $post_id, '_zwivel-toc-off', $_REQUEST['zwivel-toc-off'] );
+            $this->shared->updateTocMetaFields($post, []);
         } else {
             delete_post_meta($post_id, '_zwivel-toc-off');
         }
