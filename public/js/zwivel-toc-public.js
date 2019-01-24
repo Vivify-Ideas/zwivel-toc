@@ -255,8 +255,7 @@
 
     function scrollToID(item) {
       $('html, body').animate({
-        // 15 is padding-top added for .zwivel-toc-section, this way all scrolls work the same
-        scrollTop: $('#' + item.attr('id')).offset().top - getHeaderOffset() + 15
+        scrollTop: $('#' + item.attr('id')).offset().top - getHeaderOffset()
       }, 500);
     }
 
