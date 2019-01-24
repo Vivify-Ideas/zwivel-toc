@@ -74,6 +74,8 @@
         }
 
         var tagOffset = $(item).offset().top - getHeaderOffset() - $(window).scrollTop();
+        // added for mobile devices, without this line header changing does not work as expected
+        tagOffset -= 2;
 
         if (tagOffset <= 0 && tagOffset > lastPassedTocTagOffset) {
           lastPassedTocTagOffset = tagOffset;
