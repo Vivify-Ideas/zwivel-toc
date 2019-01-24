@@ -353,7 +353,7 @@ class Zwivel_Toc_Shared
     private function createTOCItemAnchor( $id, $title )
     {
         return sprintf(
-            '<a href="%1$s" title="%2$s">' . $title . '</a>',
+            '<a href="#" data-href="%1$s" title="%2$s">' . $title . '</a>',
             esc_url( $this->createTOCItemURL( $id ) ),
             esc_attr( strip_tags( $title ) )
         );

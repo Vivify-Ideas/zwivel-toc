@@ -200,17 +200,8 @@
 
 
 @media(max-width: 768px) {
-    .zw-toc-title-container--hidden {
-        display: none;
-    }
 
-    .zwivel-toc-title--hidden {
-        display: none;
-    }
-}
-
-@media(min-width: 768px) {
-    .zwivel-toc-section {
-        padding-top: 10px;
+    .post-content div#toc_container {
+        display: none !important;
     }
 }
