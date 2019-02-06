@@ -258,6 +258,7 @@
             $('html, body').animate({
                 scrollTop: $('#' + item.attr('id')).offset().top - getHeaderOffset()
             }, 500);
+            updateUrlSegment(item.attr('id'));
         }
 
 
@@ -265,9 +266,12 @@
             $('html, body').animate({
                 scrollTop: $(currentId).parent().offset().top - getHeaderOffset()
             }, 500);
+            updateUrlSegment(currentId);
         }
 
-
+        function updateUrlSegment(hash) {
+            window.location.hash = hash;
+        }
 
         /******************/
         /* MAIN EXECUTION */
@@ -283,8 +287,10 @@
 
         window.onload = function() {
             handleScroll();
+            if (window.location.hash) {
+                scrollToCurrentHeading(window.location.hash);
+            }
         };
-
 
     });
 
