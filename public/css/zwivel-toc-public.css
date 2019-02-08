@@ -205,3 +205,28 @@
         display: none !important;
     }
 }
+
+.zw-c-toc-dropdown-menu > li:nth-child(1) {
+	position: fixed;
+    width: 200px;
+}
+
+@media(max-width: 768px) {
+	.zw-c-toc-dropdown-menu > li:nth-child(1) {
+    	width: 100%;
+	}
+}
+
+.zw-c-toc-dropdown-menu > li:nth-child(2) {
+	margin-top: 3.8rem;
+}
+
+.zw-c-toc-dropdown-menu {
+	max-height: calc(100vh - 13rem);
+}
+
+@media (max-width: 992px) {
+	.zw-c-toc-dropdown-menu {
+		max-height: calc(100vh - 18rem);
+	}
+}
