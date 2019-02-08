@@ -56,7 +56,7 @@
             sidebarTocHrefs.push(sidebarTOCItems[i].getAttribute('data-href').substr(1));
         }
 
-        lastHTag = sidebarTocHrefs.pop();
+        lastHTag = sidebarTocHrefs[sidebarTocHrefs.length - 1];
 
 
         /******************/
@@ -280,7 +280,15 @@
         function scrollToCurrentHeading(currentId) {
             $('html, body').animate({
                 scrollTop: $(currentId).parent().offset().top - getHeaderOffset()
-            }, 500);
+            }, 500, function() {
+                setTimeout(function() {
+                    if (!next) {
+                        isArticleEnd = false;
+                        return;
+                    }
+                    isArticleEnd = true;
+                }, 100);
+            });
             updateUrlSegment(currentId);
         }
 
