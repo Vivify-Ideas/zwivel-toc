@@ -30,7 +30,8 @@ class Zwivel_Toc_Activator {
 	 * @since    1.0.0
 	 */
 	public static function activate() {
-	    Zwivel_Toc_Activator::createToc();
+	    // Line bellow is commented because client decided to disable automatic TOC creation upon plugin actiovation.
+	    //Zwivel_Toc_Activator::createToc();
 	}
 
 	private static function createToc() {
