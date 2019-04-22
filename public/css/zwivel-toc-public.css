@@ -230,3 +230,9 @@
 		max-height: calc(100vh - 18rem);
 	}
 }
+
+@media (max-width: 786px) {
+	.zw-c-toc-dropdown-menu {
+		max-height: calc(100vh - 12.5rem);
+	}
+}
