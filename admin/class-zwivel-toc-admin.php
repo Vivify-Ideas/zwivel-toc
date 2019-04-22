@@ -56,6 +56,13 @@ class Zwivel_Toc_Admin {
 
 	}
 
+    private static function getDefaults()
+    {
+        return array(
+            'heading_levels' => array('1', '2', '3', '4', '5', '6'),
+        );
+    }
+
 	/**
 	 * Register the stylesheets for the admin area.
 	 *
@@ -75,7 +82,7 @@ class Zwivel_Toc_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/zwivel-toc-admin.css', array(), $this->version, 'all' );
+		wp_enqueue_style( 'zwivel-toc-admin-css', plugin_dir_url( __FILE__ ) . 'css/zwivel-toc-admin.css', array(), rand(1, 99999), 'all' );
 
 	}
 
@@ -99,9 +106,40 @@ class Zwivel_Toc_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/zwivel-toc-admin.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( 'zwivel-toc-admin-js', plugin_dir_url( __FILE__ ) . 'js/zwivel-toc-admin.js', array('jquery'), rand(1, 99999), false );
 
 	}
+
+
+	public function zwivel_toc_register_settings()
+    {
+        if ( FALSE === get_option( 'zwivel-toc-settings' ) ) {
+            add_option( 'zwivel-toc-settings', self::getDefaults() );
+        }
+
+        register_setting( 'zwivel-toc-settings', 'zwivel-toc-settings-main-options' );
+    }
+
+
+    public function zwivel_toc_register_options_page()
+    {
+        add_options_page('Zwivel TOC Settings', 'Zwivel TOC', 'manage_options', 'zwivel-toc', array($this, 'zwivel_toc_options_page'));
+    }
+
+    public function zwivel_toc_options_page()
+    {
+        include_once('partials/zwivel-toc-admin-settings.php');
+    }
+
+    public function zwivel_toc_update_options_page()
+    {
+        if (isset($_POST['zwivel-toc-settings']['heading_levels'])) {
+            update_option('zwivel-toc-settings', $_POST['zwivel-toc-settings']['heading_levels']);
+        }
+
+        wp_redirect( $_SERVER['HTTP_REFERER'] );
+        exit();
+    }
 
 
 	public function adding_custom_meta_boxes()
@@ -116,35 +154,60 @@ class Zwivel_Toc_Admin {
         );
     }
 
-
     public function table_of_contents()
     {
         global $post;
 
-        $hTags = $this->shared->prepareHTags();
+        $value = get_post_meta($post->ID, '_zwivel-toc-off', true);
+        $checked = !empty($value) ? 'checked="checked"' : '';
 
-        if (!empty($hTags)) {
-            foreach ($hTags as $hTag) {
-                echo '<span>H' . $hTag['heading'] . '</span>';
-                echo '<input type="hidden" name="h-tags[headings][]" value="' . $hTag['heading'] . '" class="widefat">';
-                echo '<input type="hidden" name="h-tags[ids][]" value="' . $hTag['id'] . '" class="widefat">';
-                echo '<input type="hidden" name="h-tags[default_values][]" value="' . $hTag['default_value'] . '" class="widefat">';
-                echo '<input type="text" name="h-tags[values][]" value="' . $hTag['value'] . '" class="widefat">';
+        echo '<div class="zw-toc-admin-checkbox">';
+        echo '<label><input type="checkbox" value="1" ' . $checked . ' name="zwivel-toc-off" />Turn off TOC for this post</label>';
+        echo '</div>';
 
-                echo '<br/>';
+        $hTagsFromDB = get_post_meta( $post->ID, '_zwivel-toc-h-tags', TRUE );
+
+        if (!empty($hTagsFromDB)) {
+            $hTags = $this->shared->prepareHTags($hTagsFromDB);
+            $hTags = $this->shared->removeHeadingsDeselectedInSettings($hTags);
+
+            for ($i = 0; $i < count($hTags); $i++) {
+
+                $checked = (!empty($hTags[$i]['exclude'])) ? 'checked="checked"' : '';
+
+                echo '<div class="zw-c-admin-checkbox-container">';
+                echo '<div class="zw-c-admin-checkbox-item">';
+                echo '<input type="hidden" name="h-tags[exclude][' . $i . ']" value="0">';
+                echo '<input class="zw-c-admin-checkbox" type="checkbox" '. $checked . '" name="h-tags[exclude][' . $i . ']" value="1">';
+                echo '<label>H' . $hTags[$i]['heading'] . '</label>';
+                echo '</div>';
+                echo '<input type="hidden" name="h-tags[headings][' . $i . ']" value="' . $hTags[$i]['heading'] . '">';
+                echo '<input type="hidden" name="h-tags[ids][' . $i . ']" value="' . $hTags[$i]['id'] . '">';
+                echo '<input type="hidden" name="h-tags[default_values][' . $i . ']" value="' . $hTags[$i]['default_value'] . '">';
+                echo '<input type="text" name="h-tags[values][' . $i . ']" value="' . (!empty($hTags[$i]['value']) ? $hTags[$i]['value'] : $hTags[$i]['default_value']) . '">';
+                echo '<small>#' . str_replace( ' ', '_', $hTags[$i]['default_value'] )  . '</small>';
+
+                echo '</div>';
             }
         } else {
             $headings = $this->shared->extractHeadings($post->post_content);
 
-            foreach ($headings as $heading) {
+            for ($i = 0; $i < count($headings); $i++) {
+                $checked = (isset($headings[$i]['exclude'])) ? 'checked="checked"' : '';
 
-                echo '<span>H' . $heading[2] . '</span>';
-                echo '<input type="hidden" name="h-tags[headings][]" value="' . $heading[2] . '" class="widefat">';
-                echo '<input type="hidden" name="h-tags[ids][]" value="' . $heading['id'] . '" class="widefat">';
-                echo '<input type="hidden" name="h-tags[default_values][]" value="' . strip_tags( $heading[0] )  . '" class="widefat">';
-                echo '<input type="text" name="h-tags[values][]" value="' . strip_tags( $heading[0] )  . '" class="widefat">';
+                echo '<div class="zw-c-admin-checkbox-container">';
+                echo '<div class="zw-c-admin-checkbox-item">';
+                echo '<input type="hidden" name="h-tags[exclude][' . $i . ']" value="0">';
+                echo '<input class="zw-c-admin-checkbox" type="checkbox" '. $checked . '" name="h-tags[exclude][' . $i . ']" value="1">';
+                echo '<label>H' . $headings[$i][2] . '</label>';
+                echo '</div>';
+                echo '<input type="hidden" name="h-tags[headings][' . $i . ']" value="' . $headings[$i][2] . '">';
+                echo '<input type="hidden" name="h-tags[ids][' . $i . ']" value="' . $headings[$i]['id'] . '">';
+                echo '<input type="hidden" name="h-tags[default_values][' . $i . ']" value="' . strip_tags($headings[$i][0]) . '">';
+                echo '<input type="text" name="h-tags[values][' . $i . ']" value="' . strip_tags($headings[$i][0]) . '">';
+                echo '<small>#' . str_replace( ' ', '_', strip_tags($headings[$i][0]) )  . '</small>';
 
-                echo '<br/>';
+                echo '</div>';
             }
         }
 
@@ -161,8 +224,14 @@ class Zwivel_Toc_Admin {
      */
     public function save($post_id, $post, $update)
     {
-        if ( isset( $_REQUEST['h-tags'] ) && ! empty( $_REQUEST['h-tags'] ) ) {
-            update_post_meta( $post_id, '_zwivel-toc-h-tags', $_REQUEST['h-tags'] );
+        if ( isset( $_REQUEST['h-tags'] ) && !empty( $_REQUEST['h-tags'] ) ) {
+            $this->shared->updateTocMetaFields($post, $_REQUEST['h-tags']);
+        }
+
+        if ( isset( $_REQUEST['zwivel-toc-off'] ) && !empty( $_REQUEST['zwivel-toc-off'] ) ) {
+            $this->shared->updateTocMetaFields($post, []);
+        } else {
+            delete_post_meta($post_id, '_zwivel-toc-off');
         }
     }
 

@@ -29,4 +29,25 @@
 	 * practising this, we should strive to set a better example in our own work.
 	 */
 
+  $(function() {
+
+    var checkboxes = $('.zw-c-admin-checkbox');
+
+    checkboxes.each(function() {
+      toggleHTagAppearance($(this));
+		});
+
+    checkboxes.change(function() {
+      toggleHTagAppearance($(this));
+		});
+
+    function toggleHTagAppearance(checkbox) {
+      if (checkbox.is(':checked')) {
+        checkbox.parent().addClass('checked');
+      } else {
+        checkbox.parent().removeClass('checked');
+      }
+    }
+	});
+
 })( jQuery );

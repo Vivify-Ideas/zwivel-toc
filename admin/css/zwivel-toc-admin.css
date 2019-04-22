@@ -2,3 +2,62 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
+
+.zw-toc-admin-checkbox {
+    margin-bottom: 2rem;
+}
+
+.zw-c-admin-checkbox-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 5px;
+}
+
+.zw-c-admin-checkbox-container > small {
+    flex-grow: 1;
+    width: 100%;
+    word-break: break-all;
+}
+
+.zw-c-admin-checkbox-container > input {
+    flex-grow: 1;
+}
+
+.zw-c-admin-checkbox-item {
+    position: relative;
+    display: inline-flex;
+    border: 1px solid #ddd;
+    border-right: none;
+    margin: 1px -1px 1px 0;
+    padding: 3px 5px 3px 6px;
+}
+
+.zw-c-admin-checkbox-item.checked:before {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-40deg);
+    z-index: 15;
+    content: '';
+    width: 35px;
+    height: 1px;
+    background-color: red;
+}
+
+.zw-c-admin-checkbox-item > input {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -30%);
+    z-index: 10;
+    opacity: 0
+}
+
+.zw-c-admin-checkbox-item > label {
+    position: relative;
+    z-index: 9;
+}
+
+.zw-c-admin-checkbox-item.checked > label {
+    color: #dddddd;
+}

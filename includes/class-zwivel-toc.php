@@ -128,6 +128,11 @@ class Zwivel_Toc {
          */
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'shared/class-zwivel-toc-shared.php';
 
+        /**
+         * The class responsible for defining widget.
+         */
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'shared/class-zwivel-toc-widget.php';
+
 		$this->loader = new Zwivel_Toc_Loader();
 
 	}
@@ -164,6 +169,11 @@ class Zwivel_Toc {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'add_meta_boxes_post', $plugin_admin, 'adding_custom_meta_boxes' );
 		$this->loader->add_action( 'save_post', $plugin_admin, 'save', 10, 3 );
+        $this->loader->add_action( 'wp_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
+        $this->loader->add_action( 'wp_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+        $this->loader->add_action( 'admin_menu', $plugin_admin, 'zwivel_toc_register_settings' );
+        $this->loader->add_action( 'admin_menu', $plugin_admin, 'zwivel_toc_register_options_page' );
+        $this->loader->add_action( 'admin_post_update_zwivel_toc_settings', $plugin_admin, 'zwivel_toc_update_options_page' );
 
 	}
 
@@ -180,11 +190,11 @@ class Zwivel_Toc {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
-        $this->loader->add_action( 'zwivel_toc_sticky', $plugin_public, 'zwivel_toc_sticky' );
+        $this->loader->add_action( 'zwivel_toc_sticky_dropdown', $plugin_public, 'zwivel_toc_sticky_dropdown' );
         $this->loader->add_action( 'enqueue_scripts', $plugin_public, 'enqueue_scripts' );
         $this->loader->add_action( 'enqueue_styles', $plugin_public, 'enqueue_styles' );
+        $this->loader->add_action( 'widgets_init', $plugin_public, 'register_zwivel_toc_widget' );
         $this->loader->add_filter( 'the_content', $plugin_public, 'the_content', 100 );
-
 
 	}
 

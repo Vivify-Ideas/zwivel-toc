@@ -74,7 +74,7 @@ class Zwivel_Toc_Public
          * class.
          */
 
-        wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/zwivel-toc-public.css', array(), $this->version, 'all');
+        wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/zwivel-toc-public.css', array(), rand(1, 99999), 'all');
 
     }
 
@@ -98,14 +98,29 @@ class Zwivel_Toc_Public
          * class.
          */
 
-        wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/zwivel-toc-public.js', array('jquery'), $this->version, false);
+        global $post;
+
+        $tocOff = get_post_meta($post->ID, '_zwivel-toc-off', true);
+        $hTagsFromDB = get_post_meta( $post->ID, '_zwivel-toc-h-tags', TRUE );
+
+        if ($tocOff) {
+            return;
+        }
+
+        if ($post->post_type === 'post' && !empty($hTagsFromDB)) {
+            wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/zwivel-toc-public.js', array('jquery'), rand(1, 99999), false);
+        }
 
     }
 
     public function the_content($content)
     {
-        // bail if feed, search or archive
-        if ( is_feed() || is_search() || is_archive() ) {
+        global $post;
+
+        $tocOff = get_post_meta($post->ID, '_zwivel-toc-off', true);
+
+        // bail if feed, search, archive or toc is turned off by admin
+        if ( is_feed() || is_search() || is_archive() || $tocOff) {
             return $content;
         }
 
@@ -114,175 +129,27 @@ class Zwivel_Toc_Public
         $find = $this->shared->getHeadings();
         $replace = $this->shared->getHeadingsWithAnchors();
 
-        $hTags = $this->shared->prepareHTags();
-        $html = $this->getTOC($hTags);
-
-        return $html . Zwivel_Toc_Shared::mb_find_replace( $find, $replace, $content );
+        return Zwivel_Toc_Shared::mb_find_replace( $find, $replace, $content );
     }
 
 
-    public function getTOC($hTags)
+    public function zwivel_toc_sticky_dropdown()
     {
-        $html = '';
+        global $post;
 
-        // add container, toc title and list items
-        $html .= '<div id="zwivel-toc-container" class="">' . PHP_EOL;
+        $hTagsFromDB = get_post_meta( $post->ID, '_zwivel-toc-h-tags', TRUE );
 
-        $html .= '<div class="zwivel-toc-title-container">' . PHP_EOL;
-
-        $html .= '<p class="zwivel-toc-title">Table of Contents</p>' . PHP_EOL;
-
-        $html .= '</div>' . PHP_EOL;
-
-        ob_start();
-        $html .= ob_get_clean();
-        $html .= '<nav>' . $this->getTOCList($hTags) . '</nav>';
-
-        ob_start();
-        $html .= ob_get_clean();
-        $html .= '</div>' . PHP_EOL;
-
-        return $html;
-
-    }
-
-    public function getTOCList($hTags)
-    {
-        $html = '';
-
-//        if ( $this->hasTOCItems ) {
-            $html .= $this->createTOC( $hTags );
-            $html  = '<ul class="ez-toc-list">' . $html . '</ul>';
-//        }
-
-        return $html;
-    }
-
-    /**
-     * Generate the TOC list items for a given page within a post.
-     *
-     * @access private
-     * @since  2.0
-     *
-     * @param int   $page    The page of the post to create the TOC items for.
-     * @param array $matches The heading from the post content extracted with preg_match_all().
-     *
-     * @return string The HTML list of TOC items.
-     */
-    private function createTOC( $hTags )
-    {
-        $html = '';
-
-        $current_depth      = 100;    // headings can't be larger than h6 but 100 as a default to be sure
-        $numbered_items     = array();
-        $numbered_items_min = NULL;
-
-        // find the minimum heading to establish our baseline
-        for ( $i = 0; $i < count( $hTags ); $i ++ ) {
-            if ( $current_depth > $hTags[ $i ]['heading'] ) {
-                $current_depth = (int) $hTags[ $i ]['heading'];
-            }
+        if (!empty($hTagsFromDB)) {
+            $hTags = $this->shared->prepareHTags($hTagsFromDB);
+            $hTags = $this->shared->removeHeadingsDeselectedInSettings($hTags);
+            echo $this->shared->createTOC($hTags);
         }
 
-        $numbered_items[ $current_depth ] = 0;
-        $numbered_items_min = $current_depth;
-
-        for ( $i = 0; $i < count( $hTags ); $i ++ ) {
-
-            if ( $current_depth == (int) $hTags[ $i ]['heading'] ) {
-
-                $html .= '<li>';
-            }
-
-            // start lists
-            if ( $current_depth != (int) $hTags[ $i ]['heading'] ) {
-
-                for ( $current_depth; $current_depth < (int) $hTags[ $i ]['heading']; $current_depth++ ) {
-
-                    $numbered_items[ $current_depth + 1 ] = 0;
-                    $html .= '<ul><li>';
-                }
-            }
-
-            $title = !empty($hTags[ $i ]['value']) ? $hTags[ $i ]['value'] : $hTags[ $i ]['default_value'];
-
-            $html .= $this->createTOCItemAnchor( $hTags[ $i ]['id'], $title );
-
-            // end lists
-            if ( $i != count( $hTags ) - 1 ) {
-
-                if ( $current_depth > (int) $hTags[ $i + 1 ]['heading'] ) {
-
-                    for ( $current_depth; $current_depth > (int) $hTags[ $i + 1 ]['heading']; $current_depth-- ) {
-
-                        $html .= '</li></ul>';
-                        $numbered_items[ $current_depth ] = 0;
-                    }
-                }
-
-                if ( $current_depth == (int) @$hTags[ $i + 1 ]['heading'] ) {
-
-                    $html .= '</li>';
-                }
-
-            } else {
-
-                // this is the last item, make sure we close off all tags
-                for ( $current_depth; $current_depth >= $numbered_items_min; $current_depth-- ) {
-
-                    $html .= '</li>';
-
-                    if ( $current_depth != $numbered_items_min ) {
-                        $html .= '</ul>';
-                    }
-                }
-            }
-        }
-
-        return $html;
     }
 
-
-    /**
-     * @access private
-     * @since  2.0
-     *
-     * @param int    $page
-     * @param string $id
-     * @param string $title
-     *
-     * @return string
-     */
-    private function createTOCItemAnchor( $id, $title )
+    public function register_zwivel_toc_widget()
     {
-        return sprintf(
-            '<a href="%1$s" title="%2$s">' . $title . '</a>',
-            esc_url( $this->createTOCItemURL( $id ) ),
-            esc_attr( strip_tags( $title ) )
-        );
-    }
-
-
-    /**
-     * @access private
-     * @since  2.0
-     *
-     * @param string $id
-     * @param int    $page
-     *
-     * @return string
-     */
-    private function createTOCItemURL( $id )
-    {
-        return '#' . $id;
-    }
-
-
-    public function zwivel_toc_sticky()
-    {
-        $hTags = $this->shared->prepareHTags();
-
-        echo $this->getTOC($hTags);
+        register_widget( 'Zwivel_TOC_Widget' );
     }
 
 }
